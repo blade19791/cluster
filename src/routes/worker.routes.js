@@ -1,8 +1,12 @@
 import express from "express";
-import { workerController } from "../controllers/worker.controller.js";
+import {
+  workerController,
+  workerStatusController,
+} from "../controllers/worker.controller.js";
 
 const router = express.Router();
 
-router.get("/worker", workerController);
+router.get("/", workerController);
+router.get("/stats", workerStatusController);
 
 export default router;

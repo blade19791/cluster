@@ -2,6 +2,7 @@ import express from "express";
 
 import healthRoutes from "./routes/health.routes.js";
 import workerRoutes from "./routes/worker.routes.js";
+import testRoutes from "./routes/test.routes.js";
 
 export function createApp(workerId) {
   const app = express();
@@ -21,8 +22,9 @@ export function createApp(workerId) {
     res.send(`Hello from worker ${workerId} (pid: ${process.pid})\n`);
   });
 
-  app.use("/api", healthRoutes);
-  app.use("/api", workerRoutes);
+  app.use("/health", healthRoutes);
+  app.use("/worker", workerRoutes);
+  app.use("/test", testRoutes);
 
   return app;
 }
