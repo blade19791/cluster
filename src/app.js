@@ -3,6 +3,7 @@ import express from "express";
 import healthRoutes from "./routes/health.routes.js";
 import workerRoutes from "./routes/worker.routes.js";
 import testRoutes from "./routes/test.routes.js";
+import crashRoutes from "./routes/crash.route.js";
 
 export function createApp(workerId) {
   const app = express();
@@ -25,6 +26,7 @@ export function createApp(workerId) {
   app.use("/health", healthRoutes);
   app.use("/worker", workerRoutes);
   app.use("/test", testRoutes);
+  app.use("/crash", crashRoutes);
 
   return app;
 }
