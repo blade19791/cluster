@@ -6,6 +6,7 @@ import { createApp } from "./app.js";
 const port = process.env.PORT || 5000;
 const WORKER_COUNT = 4;
 const INTENTIONAL_EXIT_CODE = 0;
+const DRAIN_TIMEOUT_MS = Number(process.env.DRAIN_TIMEOUT_MS) || 10000;
 
 const primary = cluster.isPrimary;
 const intentionalStops = new Set();
@@ -74,10 +75,29 @@ if (primary) {
 } else {
   const workerId = cluster.worker.id;
   const app = createApp(workerId);
-
-  app.listen(port, () => {
+  const server = app.listen(port, () => {
     console.log(
       `Server running on port ${port} (Worker: ${workerId}, pid: ${process.pid})`,
     );
   });
+
+  let draining = false;
+  const shutdown = (signal) => {
+    if (draining) return;
+    draining = true;
+    console.log(`[worker ${workerId}] ${signal} — draining in-flight requests`);
+    server.close(() => {
+      console.log(`[worker ${workerId}] drained — exiting`);
+      process.exit(INTENTIONAL_EXIT_CODE);
+    });
+    server.closeIdleConnections();
+    setTimeout(() => {
+      console.log(`[worker ${workerId}] drain timeout — forcing exit`);
+      process.exit(INTENTIONAL_EXIT_CODE);
+    }, DRAIN_TIMEOUT_MS).unref();
+  };
+
+  for (const signal of ["SIGTERM", "SIGINT"]) {
+    process.on(signal, () => shutdown(signal));
+  }
 }

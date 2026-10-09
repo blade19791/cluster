@@ -4,6 +4,7 @@ import healthRoutes from "./routes/health.routes.js";
 import workerRoutes from "./routes/worker.routes.js";
 import testRoutes from "./routes/test.routes.js";
 import crashRoutes from "./routes/crash.route.js";
+import slowRoutes from "./routes/slow.routes.js";
 
 export function createApp(workerId) {
   const app = express();
@@ -27,6 +28,7 @@ export function createApp(workerId) {
   app.use("/worker", workerRoutes);
   app.use("/test", testRoutes);
   app.use("/crash", crashRoutes);
+  app.use("/", slowRoutes);
 
   return app;
 }
