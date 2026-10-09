@@ -1,3 +1,5 @@
+import { askPrimary } from "../ipc.js";
+
 export const workerController = (req, res) => {
   try {
     const workerInfo = {
@@ -30,5 +32,14 @@ export const workerStatusController = (req, res) => {
     res.status(200).json(workerStats);
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const primaryStatusController = async (req, res) => {
+  try {
+    const data = await askPrimary("getPrimaryStatus", "primaryStatus");
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(504).json({ error: error.message });
   }
 };

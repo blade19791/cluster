@@ -60,6 +60,17 @@ if (primary) {
       }
     });
   }
+
+  cluster.on("message", (worker, msg) => {
+    if (msg?.type !== "getPrimaryStatus") return;
+
+    const data = {
+      primaryPid: process.pid,
+      workers: Object.keys(cluster.workers).length,
+    };
+
+    worker.send({ type: "primaryStatus", requestId: msg.requestId, data });
+  });
 } else {
   const workerId = cluster.worker.id;
   const app = createApp(workerId);
